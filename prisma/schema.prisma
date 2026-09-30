@@ -7,8 +7,112 @@ datasource db {
   provider = "postgresql"
 }
 
-model Todo {
-  id        Int      @id @default(autoincrement())
-  title     String
-  createdAt DateTime @default(now())
+enum Role {
+  user
+  admin
+}
+
+enum CardType {
+  character
+  weapon
+}
+
+enum WeaponType {
+  sword
+  claymore
+  polearm
+  bow
+  catalyst
+}
+
+enum Element {
+  pyro
+  hydro
+  anemo
+  electro
+  dendro
+  cryo
+  geo
+}
+
+model User {
+  id           String        @id @db.Uuid
+  discordId    String        @unique @map("discord_id")
+  username     String        @unique
+  avatarUrl    String?       @map("avatar_url")
+  role         Role          @default(user)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  packOpenings PackOpening[]
+  userCards    UserCard[]
+
+  @@map("users")
+}
+
+model Rarity {
+  stars      Int    @id
+  dropWeight Int    @map("drop_weight")
+  color      String
+  cards      Card[]
+
+  @@map("rarities")
+}
+
+model PackOpening {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  openedOn  DateTime @map("opened_on") @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id])
+  packCards PackCard[]
+
+  @@unique([userId, openedOn]) // one user can only have one pack opening per day
+  @@map("pack_openings")
+}
+
+model Card {
+  id         String      @id @default(uuid()) @db.Uuid
+  type       CardType
+  name       String
+  image      String?
+  stars      Int
+  element    Element?
+  weaponType WeaponType? @map("weapon_type")
+  isActive   Boolean     @default(true) @map("is_active")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  rarity    Rarity     @relation(fields: [stars], references: [stars])
+  packCards PackCard[]
+  userCards UserCard[]
+
+  @@map("cards")
+}
+
+model PackCard {
+  id            String   @id @default(uuid()) @db.Uuid
+  packOpeningId String   @map("pack_opening_id") @db.Uuid
+  cardId        String   @map("card_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+  isNew         Boolean  @default(false) @map("is_new")
+
+  packOpening PackOpening @relation(fields: [packOpeningId], references: [id])
+  card        Card        @relation(fields: [cardId], references: [id])
+
+  @@map("pack_cards")
+}
+
+model UserCard {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  cardId    String   @map("card_id") @db.Uuid
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@unique([userId, cardId]) // one row per user+card, duplicates go in quantity
+  @@map("user_cards")
 }

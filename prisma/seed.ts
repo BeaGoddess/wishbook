@@ -12,20 +12,24 @@ const prisma = new PrismaClient({ adapter })
 
 async function main() {
   console.log('🌱 Seeding database...')
-
-  // Clear existing todos
-  await prisma.todo.deleteMany()
-
-  // Create example todos
-  const todos = await prisma.todo.createMany({
-    data: [
-      { title: 'Buy groceries' },
-      { title: 'Read a book' },
-      { title: 'Workout' },
-    ],
+  await prisma.rarity.upsert({
+    where: { stars: 3 },
+    update: { dropWeight: 80, color: '#4a90d9' },
+    create: { stars: 3, dropWeight: 80, color: '#4a90d9' },
   })
 
-  console.log(`✅ Created ${todos.count} todos`)
+  await prisma.rarity.upsert({
+    where: { stars: 4 },
+    update: { dropWeight: 17, color: '#a256e1' },
+    create: { stars: 4, dropWeight: 17, color: '#a256e1' },
+  })
+
+  await prisma.rarity.upsert({
+    where: { stars: 5 },
+    update: { dropWeight: 3, color: '#e2a93b' },
+    create: { stars: 5, dropWeight: 3, color: '#e2a93b' },
+  })
+  console.log('🌱 Rarities seeded')
 }
 
 main()
