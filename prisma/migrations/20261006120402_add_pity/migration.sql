@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "guaranteed_new_4" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "guaranteed_new_5" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "pity_4" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "pity_5" INTEGER NOT NULL DEFAULT 0;

@@ -36,14 +36,18 @@ enum Element {
 }
 
 model User {
-  id           String        @id @db.Uuid
-  discordId    String        @unique @map("discord_id")
-  username     String        @unique
-  avatarUrl    String?       @map("avatar_url")
-  role         Role          @default(user)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  packOpenings PackOpening[]
-  userCards    UserCard[]
+  id             String        @id @db.Uuid
+  discordId      String        @unique @map("discord_id")
+  username       String        @unique
+  avatarUrl      String?       @map("avatar_url")
+  role           Role          @default(user)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  pity5          Int           @default(0) @map("pity_5")
+  pity4          Int           @default(0) @map("pity_4")
+  guaranteedNew5 Boolean       @default(false) @map("guaranteed_new_5")
+  guaranteedNew4 Boolean       @default(false) @map("guaranteed_new_4")
+  packOpenings   PackOpening[]
+  userCards      UserCard[]
 
   @@map("users")
 }
